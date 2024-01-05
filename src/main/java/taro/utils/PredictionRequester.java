@@ -16,7 +16,6 @@ public class PredictionRequester {
     }
 
     public String request(String request) throws IOException {
-        System.out.println(config);
         Socket client = new Socket(config.getHost(), config.getPort());
 
         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
