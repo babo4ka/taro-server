@@ -1,6 +1,8 @@
 package taro.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +26,7 @@ public class PredictionsController {
     private final String filesPath = "./src/main/resources/predictions/";
 
     @GetMapping("/getGeneral")
-    public String getGeneralPred() throws IOException {
+    public ResponseEntity<String> getGeneralPred() throws IOException {
         PredictionRequester pr = new PredictionRequester();
         String text = pr.request("1");
 
@@ -37,9 +39,14 @@ public class PredictionsController {
         writer.write(text);
         writer.flush();
 
-        predictionsService.addPrediction(new Date().getTime() / 1000, 1, fileName);
+        try {
+            predictionsService.addPrediction(new Date().getTime() / 1000, 1, fileName);
+        }catch (Exception e){
+            return new ResponseEntity<>("не так часто я не успеваю!!", HttpStatus.BAD_GATEWAY);
+        }
 
-        return text;
+
+        return new ResponseEntity<>(text, HttpStatus.OK);
     }
 
 
