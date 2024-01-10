@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import taro.Application;
 import taro.database.service.PredictionsService;
 import taro.utils.PredictionRequester;
@@ -26,9 +23,11 @@ public class PredictionsController {
     private final String filesPath = "./src/main/resources/predictions/";
 
     @GetMapping("/getGeneral")
-    public ResponseEntity<String> getGeneralPred() throws IOException {
+    public ResponseEntity<String> getGeneralPred(
+            @RequestParam("len") int len
+    ) throws IOException {
         PredictionRequester pr = new PredictionRequester();
-        String text = pr.request("1");
+        String text = pr.request("1-" + len);
 
 
         String fileName = new Date().getTime() + ".txt";
@@ -51,7 +50,9 @@ public class PredictionsController {
 
 
     @GetMapping("/getYN")
-    public List<String> getYNPred() throws IOException, InterruptedException {
+    public List<String> getYNPred(
+            @RequestParam("len") int len
+    ) throws IOException, InterruptedException {
         PredictionRequester pr = new PredictionRequester();
 
         List<String> response = new ArrayList<>();
@@ -60,7 +61,7 @@ public class PredictionsController {
         String fileName;
 
         for(int i =0; i<3; i++){
-            text = pr.request("2");
+            text = pr.request("2-" + len);
             fileName = new Date().getTime() + ".txt";
 
             File predFile = new File(filesPath + "yn/" +  fileName);
@@ -79,7 +80,9 @@ public class PredictionsController {
     }
 
     @GetMapping("/getPPF")
-    public Map<String, String> getPPFPred() throws IOException, InterruptedException {
+    public Map<String, String> getPPFPred(
+            @RequestParam("len") int len
+    ) throws IOException, InterruptedException {
         //переменные
         PredictionRequester pr = new PredictionRequester();
 
@@ -90,7 +93,7 @@ public class PredictionsController {
         FileWriter writer;
 
         //запрос о прошлом
-        String pastText = pr.request("3");
+        String pastText = pr.request("3-" + len);
         fileName = new Date().getTime() + ".txt";
         //запись в файл
         file = new File(filesPath + "past/" + fileName);
@@ -104,7 +107,7 @@ public class PredictionsController {
 
 
         //запрос о настоящем
-        String presentText = pr.request("4");
+        String presentText = pr.request("4-" + len);
         fileName = new Date().getTime() + ".txt";
         //запись в файл
         file = new File(filesPath + "present/" + fileName);
@@ -118,7 +121,7 @@ public class PredictionsController {
 
 
         //запрос о будущем
-        String futureText = pr.request("5");
+        String futureText = pr.request("5-" + len);
         fileName = new Date().getTime() + ".txt";
         //запись в файл
         file = new File(filesPath + "future/" + fileName);
